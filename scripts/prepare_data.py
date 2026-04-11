@@ -19,7 +19,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
 
 # ──────────────── 路径配置 ────────────────
-SRC_DIR = Path(__file__).parent.parent.parent / "tarot-static" / "cards"
+SRC_DIR = Path(__file__).parent.parent / "tarot-static" / "cards" / "cards"
 OUT_DIR = Path(__file__).parent / "dataset"
 IMG_TRAIN = OUT_DIR / "images" / "train"
 IMG_VAL   = OUT_DIR / "images" / "val"

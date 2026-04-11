@@ -1,0 +1,27 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Data (generated at runtime)
+dataset/
+*.jpg
+*.png
+*.jpeg
+*.txt
+
+# Models (download at runtime)
+*.pt
+*.pth
+*.weights
+
+# Training outputs
+runs/
+wandb/
+
+# Logs
+*.log
