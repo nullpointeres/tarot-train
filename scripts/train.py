@@ -16,8 +16,8 @@ from pathlib import Path
 from ultralytics import YOLO
 
 # ──────────────── 路径配置 ────────────────
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-DATA_YAML    = PROJECT_ROOT / "tarot-train" / "scripts" / "dataset" / "tarot.yaml"
+PROJECT_ROOT = Path(__file__).parent.parent
+DATA_YAML    = PROJECT_ROOT / "scripts" / "dataset" / "tarot.yaml"
 MODEL_DIR    = PROJECT_ROOT / "models"
 
 def get_device(arg: str | None) -> str:
@@ -53,11 +53,11 @@ def main():
         sys.exit(1)
 
     # 加载模型
-    model_path = PROJECT_ROOT / "models" / args.model
+    model_path = PROJECT_ROOT / args.model
     if args.resume_from:
         model = YOLO(args.resume_from)
     else:
-        model = YOLO(args.model)
+        model = YOLO(str(model_path))
 
     print(f"[INFO] 开始训练，基础模型: {args.model}")
     print(f"[INFO] 数据集配置: {DATA_YAML}")

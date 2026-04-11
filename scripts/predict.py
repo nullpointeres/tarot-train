@@ -13,8 +13,8 @@ from pathlib import Path
 
 from ultralytics import YOLO
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-SRC_DIR = PROJECT_ROOT / "tarot-static" / "cards"
+PROJECT_ROOT = Path(__file__).parent.parent
+SRC_DIR = PROJECT_ROOT / "tarot-static" / "cards" / "cards"
 
 # 牌号 → 中文名（78 类）
 CARD_NAMES = {
