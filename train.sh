@@ -33,17 +33,17 @@ echo "[OK] 找到 $IMG_COUNT 张原图"
 # 2. 生成数据集
 echo ""
 echo "[Step 2] 生成合成训练数据集..."
-$PYTHON "$SCRIPT_DIR/scripts/prepare_data.py" --augment 100 --val-split 0.15
+$PYTHON "$SCRIPT_DIR/scripts/prepare_data.py" --augment 30 --val-split 0.15
 
 # 3. 开始训练
 echo ""
 echo "[Step 3] 开始训练..."
 $PYTHON "$SCRIPT_DIR/scripts/train.py" \
     --model "$SCRIPT_DIR/yolo11n.pt" \
-    --epochs 200 \
+    --epochs 50 \
     --imgsz 320 \
     --batch 1 \
-    --patience 50
+    --patience 20
 
 echo ""
 echo "=========================================="
