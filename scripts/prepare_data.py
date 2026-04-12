@@ -247,19 +247,21 @@ def main():
     LBL_TRAIN.mkdir(parents=True, exist_ok=True)
     LBL_VAL.mkdir(parents=True, exist_ok=True)
 
-    total = 0
-    for split_files, img_dir, lbl_dir in [
-        (train_files, IMG_TRAIN, LBL_TRAIN),
-        (val_files,   IMG_VAL,   LBL_VAL),
-    ]:
-        for card_path in split_files:
-            class_id, _, _ = parse_card_info(card_path.name)
-            for i in range(args.augment):
-                synth_one(card_path, class_id, i, img_dir, lbl_dir)
-                total += 1
-        print(f"  完成 {img_dir.parent.name}/{img_dir.name}: {len(split_files) * args.augment} 张")
+    # 按图片分配 train/val（不是按类别），确保所有 78 类都在训练集
+    for card_path in src_files:
+        class_id, _, _ = parse_card_info(card_path.name)
+        # 随机决定这张图去训练集还是验证集
+        is_val = random.random() < args.val_split
+        img_dir = IMG_VAL if is_val else IMG_TRAIN
+        lbl_dir = LBL_VAL if is_val else LBL_TRAIN
 
-    print(f"\n总计生成 {total} 张合成图 ✓")
+        for i in range(args.augment):
+            synth_one(card_path, class_id, i, img_dir, lbl_dir)
+
+    train_count = len(list(IMG_TRAIN.glob("*.jpg")))
+    val_count = len(list(IMG_VAL.glob("*.jpg")))
+    print(f"\n总计生成 {train_count + val_count} 张合成图 ✓")
+    print(f"训练集: {train_count} 张  验证集: {val_count} 张")
     print(f"训练集: {IMG_TRAIN}  标签: {LBL_TRAIN}")
     print(f"验证集: {IMG_VAL}    标签: {LBL_VAL}")
 

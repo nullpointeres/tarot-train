@@ -40,10 +40,10 @@ echo ""
 echo "[Step 3] 开始训练..."
 $PYTHON "$SCRIPT_DIR/scripts/train.py" \
     --model "$SCRIPT_DIR/yolo11n.pt" \
-    --epochs 50 \
+    --epochs 30 \
     --imgsz 320 \
     --batch 1 \
-    --patience 20
+    --patience 100
 
 echo ""
 echo "=========================================="
