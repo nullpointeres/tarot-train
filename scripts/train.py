@@ -9,9 +9,11 @@
   python train.py --device mps          # Mac M 系列
 """
 
+from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import Optional
 
 from ultralytics import YOLO
 
@@ -20,7 +22,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 DATA_YAML    = PROJECT_ROOT / "scripts" / "dataset" / "tarot.yaml"
 MODEL_DIR    = PROJECT_ROOT / "models"
 
-def get_device(arg: str | None) -> str:
+def get_device(arg: Optional[str]) -> str:
     """自动检测最佳设备"""
     if arg:
         return arg
