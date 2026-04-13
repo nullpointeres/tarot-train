@@ -134,30 +134,56 @@ def paste_card(bg: Image, card_img: Image, target_w: int, target_h: int,
     new_w = int(card_img.width * scale)
     new_h = int(card_img.height * scale)
 
-    # 旋转
-    rotated = card_img.resize((new_w, new_h), Image.LANCZOS)
+    # 调整亮度和对比度（先做，避免旋转后丢失质量）
+    enhancer_b = ImageEnhance.Brightness(card_img)
+    card_img = enhancer_b.enhance(brightness)
+    enhancer_c = ImageEnhance.Contrast(card_img)
+    card_img = enhancer_c.enhance(contrast)
+
+    # 缩放
+    card_img = card_img.resize((new_w, new_h), Image.LANCZOS)
+
+    # 旋转（expand=True 会扩展画布以容纳旋转后的角点）
     if abs(angle) > 0.5:
-        rotated = rotated.rotate(angle, expand=True, fillcolor=(255, 255, 255))
+        rotated = card_img.rotate(angle, expand=True, fillcolor=(255, 255, 255))
+    else:
+        rotated = card_img
 
-    # 亮度和对比度调整
-    enhancer_b = ImageEnhance.Brightness(rotated)
-    rotated = enhancer_b.enhance(brightness)
-    enhancer_c = ImageEnhance.Contrast(rotated)
-    rotated = enhancer_c.enhance(contrast)
+    # 计算卡牌四个角（相对于中心点）
+    # 原始卡牌的四个角（相对于中心）
+    hw, hh = new_w / 2, new_h / 2
+    corners = np.array([
+        [-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh]
+    ])
 
-    # 中心坐标
-    cx, cy = center
-    paste_x = cx - rotated.width // 2
-    paste_y = cy - rotated.height // 2
+    # 旋转矩阵
+    rad = math.radians(angle)
+    cos_a, sin_a = math.cos(rad), math.sin(rad)
+    R = np.array([[cos_a, -sin_a], [sin_a, cos_a]])
+    rotated_corners = corners @ R.T
 
+    # 旋转后卡牌的边界框（像素坐标，相对于中心点）
+    x_min = rotated_corners[:, 0].min()
+    x_max = rotated_corners[:, 0].max()
+    y_min = rotated_corners[:, 1].min()
+    y_max = rotated_corners[:, 1].max()
+
+    # bbox 中心点 = center + 旋转后的中心偏移（原始中心到旋转中心的偏移）
+    # 因为 expand=True 旋转后的中心点也会偏移
+    bbox_cx = center[0] + (rotated.width / 2 - new_w / 2)
+    bbox_cy = center[1] + (rotated.height / 2 - new_h / 2)
+
+    # 粘贴图片（使用旋转后的展开画布）
+    paste_x = center[0] - rotated.width // 2
+    paste_y = center[1] - rotated.height // 2
     bg.paste(rotated, (paste_x, paste_y), rotated if rotated.mode == "RGBA" else None)
 
-    # 计算原始卡区域的 bbox（相对于背景尺寸）
+    # YOLO bbox（归一化到 [0,1]）
     bbox = [
-        center[0] / 1280,
-        center[1] / 1280,
-        rotated.width / 1280,
-        rotated.height / 1280,
+        bbox_cx / 1280,
+        bbox_cy / 1280,
+        (x_max - x_min) / 1280,
+        (y_max - y_min) / 1280,
     ]
     return bbox
 
